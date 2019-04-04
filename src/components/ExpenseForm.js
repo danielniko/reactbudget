@@ -14,18 +14,23 @@ class ExpenseForm extends React.Component {
         );
     }
 
-    // Add new expense
-    addExpense(expense) {
-        fetch(SERVER_URL + 'api/cars',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(car)
-            })
-            .then(res => this.fetchCars())
-            .catch(err => console.error(err))
+    // Save expense and close modal form
+    handleSubmit = (event) => {
+        event.preventDefault();
+        var newExpense = {
+            name: this.state.name, 
+            description: this.state.description,
+            category: this.state.category, 
+            amount: this.state.amount
+        };
+        this.props.addExpense(newExpense);
+        this.refs.addDialog.hide();
+    }
+
+    // Cancel and close modal form
+    cancelSubmit = (event) => {
+        event.preventDefault();
+        this.refs.addDialog.hide();
     }
 
     render() {

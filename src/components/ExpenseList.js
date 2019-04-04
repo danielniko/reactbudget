@@ -12,6 +12,24 @@ class ExpenseList extends Component {
     }
 
     componentDidMount() {
+        this.fetchExpenses();
+    }
+
+    // Add new expense
+    addExpense(expense) {
+        fetch(SERVER_URL + 'expense',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(expense)
+            })
+            .then(res => this.fetchExpenses())
+            .catch(err => console.error(err))
+    }
+
+    fetchExpenses = () => {
         fetch(SERVER_URL + 'expenses')
             .then((response) => response.json())
             .then((responseData) => {
@@ -39,6 +57,7 @@ class ExpenseList extends Component {
 
         return (
             <div className="App">
+                <ExpenseForm addExpense={this.addExpense} fetchExpenses={this.fetchExpenses}/>
                 <ReactTable data={this.state.expenses} columns={columns}
                     filterable={true} />
             </div>
