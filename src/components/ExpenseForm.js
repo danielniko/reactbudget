@@ -1,6 +1,9 @@
 import React from 'react';
 import SkyLight from 'react-skylight';
 import { SERVER_URL } from '../constants.js'
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Select from '@material-ui/core/Select';
 
 class ExpenseForm extends React.Component {
 
@@ -103,20 +106,24 @@ class ExpenseForm extends React.Component {
                 <SkyLight hideOnOverlayClicked ref={ref => this.addDialog = ref } >
                     <h3>New Expense</h3>
                     <form>
-                        <input type="text" placeholder="Name" name="name" value={this.state.name}
-                            onChange={this.handleChange} /><br />
-                        <input type="text" placeholder="Description" name="description" value={this.state.description}
-                            onChange={this.handleChange} /><br />
-                        <select name="categoryId" value={this.state.categoryId}
+                        <TextField label="Name" placeholder="Name" name="name" value={this.state.name}
+                            onChange={this.handleChange}/><br/>
+                        <TextField label="Description" placeholder="Description" name="description" value={this.state.description}
+                            onChange={this.handleChange}/><br/>
+                        <Select name="categoryId" value={this.state.categoryId}
                             onChange={this.handleChange}>
                             {this.state.categories.map(
                                 (category) => <option key={category.categoryId} value={category.categoryId}>{category.name}</option>
                             )}
-                        </select><br />
-                        <input type="text" placeholder="Amount" name="amount" value={this.state.amount}
-                            onChange={this.handleChange} /><br />
-                        <button onClick={this.handleSubmit}>Save</button>
-                        <button onClick={this.cancelSubmit}>Cancel</button>
+                        </Select><br />
+
+
+                        <TextField label="Amount" placeholder="amount" name="amount" value={this.state.amount}
+                            onChange={this.handleChange}/><br/>
+                        <Button variant="contained" color="primary" 
+                            onClick={this.handleSubmit}>Save</Button>
+                        <Button variant="contained" color="primary" 
+                             onClick={this.cancelSubmit}>Cancel</Button>
                     </form>
                 </SkyLight>
             </div>

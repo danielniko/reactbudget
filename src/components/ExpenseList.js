@@ -6,6 +6,7 @@ import ExpenseForm from './ExpenseForm.js';
 import ExpenseDetail from './ExpenseDetail.js';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Button from '@material-ui/core/Button';
 
 class ExpenseList extends Component {
 
@@ -72,21 +73,24 @@ class ExpenseList extends Component {
             filterable: false,
             width: 100,
             accessor: 'expenseId',
-            Cell: ({ value }) => (<button onClick={() => { this.doDelete(value) }}>Delete</button>)
+            Cell: ({ value }) => (<Button size="small" variant="text" color="secondary" onClick={() => { this.doDelete(value) }}>Delete</Button>)
         }, {
             id: 'viewbutton',
             sortable: false,
             filterable: false,
             width: 100,
             accessor: 'expenseId',
-            Cell: ({ value }) => (<button onClick={() => { this.expenseDetail.doView(value) }}>View</button>)
+            Cell: ({ value }) => (<Button size="small" variant="text" color="secondary" onClick={() => { this.expenseDetail.doView(value) }}>View</Button>)
         }]
 
         return (
             <div className="App">
                 <div>
-                    <button style={{ 'margin': '10px' }}
-                        onClick={() => this.expenseForm.doOpenForm()}>New Expense</button>
+                    <Button variant="contained" color="primary" 
+                                style={{'margin': '10px'}} 
+                                onClick={() => this.expenseForm.doOpenForm()}>
+                                New Expense</Button>
+
                 </div>
                 <ExpenseForm ref={ref => this.expenseForm = ref } fetchExpenses={this.fetchExpenses} expense={this.state.expense} />
                 <ExpenseDetail ref={ref => this.expenseDetail = ref } doEdit={this.doEdit} />
