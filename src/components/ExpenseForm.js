@@ -7,6 +7,7 @@ class ExpenseForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            expenseId: '',
             name: '', description: '', amount: '',
             categoryId: '', 
             categories : []
@@ -21,6 +22,26 @@ class ExpenseForm extends React.Component {
         this.setState(
             { [event.target.name]: event.target.value }
         );
+    }
+
+    doOpenForm = (expense) => {
+        this.addDialog.show();
+        if(expense) {
+            this.setState({
+                expenseId: expense.expenseId,
+                name: expense.name,
+                description: expense.description,
+                amount: expense.amount,
+                categoryId: expense.category.categoryId
+            });
+            /*
+            set state happens asynchronus
+            this.setState({expense: ex}, function () {
+                console.log("disimpan = " + JSON.stringify(this.state.expense));
+            });
+            */
+        }
+
     }
 
     fetchCategories = () => {
@@ -42,25 +63,44 @@ class ExpenseForm extends React.Component {
             categoryId: this.state.categoryId
         };
         var newExpense = {
+            expenseId: this.state.expenseId,
             name: this.state.name,
             description: this.state.description,
             category: category,
             amount: this.state.amount
         };
-        this.props.addExpense(newExpense);
-        this.refs.addDialog.hide();
+        this.saveExpense(newExpense);
+        this.addDialog.hide();
+    }
+
+    // Add new expense
+    saveExpense(expense) {
+        var method = "POST";
+        if(expense.expenseId) {
+            method = "PUT"
+        }
+        fetch(SERVER_URL + 'expense',
+            {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(expense)
+            })
+            .then(res => this.props.fetchExpenses())
+            .catch(err => console.error(err))
     }
 
     // Cancel and close modal form
     cancelSubmit = (event) => {
         event.preventDefault();
-        this.refs.addDialog.hide();
+        this.addDialog.hide();
     }
 
     render() {
         return (
             <div>
-                <SkyLight hideOnOverlayClicked ref="addDialog">
+                <SkyLight hideOnOverlayClicked ref={ref => this.addDialog = ref } >
                     <h3>New Expense</h3>
                     <form>
                         <input type="text" placeholder="Name" name="name" value={this.state.name}
@@ -73,16 +113,12 @@ class ExpenseForm extends React.Component {
                                 (category) => <option key={category.categoryId} value={category.categoryId}>{category.name}</option>
                             )}
                         </select><br />
-                        <input type="text" placeholder="Amount" name="amount"
+                        <input type="text" placeholder="Amount" name="amount" value={this.state.amount}
                             onChange={this.handleChange} /><br />
                         <button onClick={this.handleSubmit}>Save</button>
                         <button onClick={this.cancelSubmit}>Cancel</button>
                     </form>
                 </SkyLight>
-                <div>
-                    <button style={{ 'margin': '10px' }}
-                        onClick={() => this.refs.addDialog.show()}>New Expense</button>
-                </div>
             </div>
         );
     }

@@ -3,6 +3,7 @@ import { SERVER_URL } from '../constants.js'
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
 import ExpenseForm from './ExpenseForm.js';
+import ExpenseDetail from './ExpenseDetail.js';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -10,29 +11,17 @@ class ExpenseList extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { expenses: [] };
+        this.state = { 
+            expenses: []
+        };
     }
 
     componentDidMount() {
         this.fetchExpenses();
     }
 
-    // Add new expense
-    addExpense(expense) {
-        fetch(SERVER_URL + 'expense/add',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(expense)
-            })
-            .then(res => this.fetchExpenses())
-            .catch(err => console.error(err))
-    }
-
     // Delete expense
-    onDelClick = (link) => {
+    doDelete = (link) => {
         fetch(SERVER_URL + 'expense/' + link,
             { method: 'DELETE' })
             .then(res => {
@@ -47,6 +36,10 @@ class ExpenseList extends Component {
                 });
                 console.error(err)
             })
+    }
+
+    doEdit = (expense) => {
+        this.expenseForm.doOpenForm(expense);
     }
 
     fetchExpenses = () => {
@@ -79,12 +72,24 @@ class ExpenseList extends Component {
             filterable: false,
             width: 100,
             accessor: 'expenseId',
-            Cell: ({ value }) => (<button onClick={() => { this.onDelClick(value) }}>Delete</button>)
+            Cell: ({ value }) => (<button onClick={() => { this.doDelete(value) }}>Delete</button>)
+        }, {
+            id: 'viewbutton',
+            sortable: false,
+            filterable: false,
+            width: 100,
+            accessor: 'expenseId',
+            Cell: ({ value }) => (<button onClick={() => { this.expenseDetail.doView(value) }}>View</button>)
         }]
 
         return (
             <div className="App">
-                <ExpenseForm addExpense={this.addExpense} fetchExpenses={this.fetchExpenses} />
+                <div>
+                    <button style={{ 'margin': '10px' }}
+                        onClick={() => this.expenseForm.doOpenForm()}>New Expense</button>
+                </div>
+                <ExpenseForm ref={ref => this.expenseForm = ref } fetchExpenses={this.fetchExpenses} expense={this.state.expense} />
+                <ExpenseDetail ref={ref => this.expenseDetail = ref } doEdit={this.doEdit} />
                 <ReactTable data={this.state.expenses} columns={columns}
                     filterable={true} />
                 <ToastContainer autoClose={1500} />
