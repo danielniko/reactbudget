@@ -7,12 +7,14 @@ import ExpenseDetail from './ExpenseDetail.js';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from '@material-ui/core/Button';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css'
 
 class ExpenseList extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { 
+        this.state = {
             expenses: []
         };
     }
@@ -39,12 +41,31 @@ class ExpenseList extends Component {
             })
     }
 
+    confirmDelete = (link) => {
+        confirmAlert({
+            message: 'Are you sure to delete?',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: () => this.doDelete(link)
+                },
+                {
+                    label: 'No',
+                }
+            ]
+        })
+    }
+
     doEdit = (expense) => {
         this.expenseForm.doOpenForm(expense);
     }
 
     fetchExpenses = () => {
-        fetch(SERVER_URL + 'expense')
+        const token = sessionStorage.getItem("jwt");
+
+        fetch(SERVER_URL + 'expense', {
+            headers: { 'Authorization': token }
+        })
             .then((response) => response.json())
             .then((responseData) => {
                 this.setState({
@@ -73,7 +94,7 @@ class ExpenseList extends Component {
             filterable: false,
             width: 100,
             accessor: 'expenseId',
-            Cell: ({ value }) => (<Button size="small" variant="text" color="secondary" onClick={() => { this.doDelete(value) }}>Delete</Button>)
+            Cell: ({ value }) => (<Button size="small" variant="text" color="secondary" onClick={() => { this.confirmDelete(value) }}>Delete</Button>)
         }, {
             id: 'viewbutton',
             sortable: false,
@@ -86,14 +107,14 @@ class ExpenseList extends Component {
         return (
             <div className="App">
                 <div>
-                    <Button variant="contained" color="primary" 
-                                style={{'margin': '10px'}} 
-                                onClick={() => this.expenseForm.doOpenForm()}>
-                                New Expense</Button>
+                    <Button variant="contained" color="primary"
+                        style={{ 'margin': '10px' }}
+                        onClick={() => this.expenseForm.doOpenForm()}>
+                        New Expense</Button>
 
                 </div>
-                <ExpenseForm ref={ref => this.expenseForm = ref } fetchExpenses={this.fetchExpenses} expense={this.state.expense} />
-                <ExpenseDetail ref={ref => this.expenseDetail = ref } doEdit={this.doEdit} />
+                <ExpenseForm ref={ref => this.expenseForm = ref} fetchExpenses={this.fetchExpenses} expense={this.state.expense} />
+                <ExpenseDetail ref={ref => this.expenseDetail = ref} doEdit={this.doEdit} />
                 <ReactTable data={this.state.expenses} columns={columns}
                     filterable={true} />
                 <ToastContainer autoClose={1500} />

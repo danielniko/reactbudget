@@ -48,7 +48,10 @@ class ExpenseForm extends React.Component {
     }
 
     fetchCategories = () => {
-        fetch(SERVER_URL + 'category')
+        const token = sessionStorage.getItem("jwt");
+        fetch(SERVER_URL + 'category', {
+            
+        })
             .then((response) => response.json())
             .then((responseData) => {
                 this.setState({
